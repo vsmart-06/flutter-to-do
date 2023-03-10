@@ -58,13 +58,17 @@ class _CreateTaskState extends State<CreateTask> {
                     lastDate: DateTime.now().add(Duration(days: 365))
                   ).then((value) {
                     setState(() { 
-                    datetime_date = value as DateTime;
-                    date = value.toString().split(" ")[0];
-                    List date_components = date.split("-");
-                    String temp = date_components[0];
-                    date_components[0] = date_components[2];
-                    date_components[2] = temp;
-                    date = date_components.join("/");});
+                    try {
+                      datetime_date = value as DateTime;
+                      date = value.toString().split(" ")[0];
+                      List date_components = date.split("-");
+                      String temp = date_components[0];
+                      date_components[0] = date_components[2];
+                      date_components[2] = temp;
+                      date = date_components.join("/");
+                    }
+                    catch(e) {}
+                    });
                   },);
                 }, 
                 child: Row(
@@ -83,20 +87,25 @@ class _CreateTaskState extends State<CreateTask> {
                     context: context, 
                     initialTime: time_time
                   ).then((value) {
-                    setState(() {time_time = value as TimeOfDay;
-                    time = value.toString();
-                    time = time.split("(")[1].split(")")[0];
-                    List<int> time_components = [int.parse(time.split(":")[0]), int.parse(time.split(":")[1])];
-                    String meridian = time_components[0] >= 12 ? "PM" : "AM";
-                    if (time_components[0] >= 12)
-                    {
-                      time_components[0] -= 12;
+                    setState(() {
+                    try {
+                      time_time = value as TimeOfDay;
+                      time = value.toString();
+                      time = time.split("(")[1].split(")")[0];
+                      List<int> time_components = [int.parse(time.split(":")[0]), int.parse(time.split(":")[1])];
+                      String meridian = time_components[0] >= 12 ? "PM" : "AM";
+                      if (time_components[0] >= 12)
+                      {
+                        time_components[0] -= 12;
+                      }
+                      if (time_components[0] == 0)
+                      {
+                        time_components[0] = 12;
+                      }
+                      time = "${time_components[0] < 10 ? 0 : ""}${time_components[0]}:${time_components[1] < 10 ? 0 : ""}${time_components[1]} $meridian";
                     }
-                    if (time_components[0] == 0)
-                    {
-                      time_components[0] = 12;
-                    }
-                    time = "${time_components[0] < 10 ? 0 : ""}${time_components[0]}:${time_components[1] < 10 ? 0 : ""}${time_components[1]} $meridian";});
+                    catch(e) {}
+                    });
                   },);
                 }, 
                 child: Row(

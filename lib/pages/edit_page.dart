@@ -12,6 +12,7 @@ class _EditTaskState extends State<EditTask> {
   String task = "";
   String date = "";
   String time = "";
+  int id = 0;
   late DateTime datetime_date;
   late TimeOfDay time_time;
   Map data = {};
@@ -23,7 +24,7 @@ class _EditTaskState extends State<EditTask> {
     }
     else
     {
-      Navigator.pop(context, {"task": task, "date": date, "time": time, "datetime_date": datetime_date, "time_time": time_time});
+      Navigator.pop(context, {"task": task, "date": date, "time": time, "datetime_date": datetime_date, "time_time": time_time, "id": id});
     }
   }
 
@@ -43,6 +44,7 @@ class _EditTaskState extends State<EditTask> {
         task = data["task"];
         date = data["date"];
         time = data["time"];
+        id = data["id"];
         datetime_date = data["datetime_date"];
         time_time = data["time_time"];
       }
@@ -82,13 +84,18 @@ class _EditTaskState extends State<EditTask> {
                     firstDate: DateTime.now(), 
                     lastDate: DateTime.now().add(Duration(days: 365))
                   ).then((value) {
-                    setState(() {datetime_date = value as DateTime;
-                    date = value.toString().split(" ")[0];
-                    List date_components = date.split("-");
-                    String temp = date_components[0];
-                    date_components[0] = date_components[2];
-                    date_components[2] = temp;
-                    date = date_components.join("/");});
+                    setState(() {
+                    try {
+                      datetime_date = value as DateTime;
+                      date = value.toString().split(" ")[0];
+                      List date_components = date.split("-");
+                      String temp = date_components[0];
+                      date_components[0] = date_components[2];
+                      date_components[2] = temp;
+                      date = date_components.join("/");
+                    }
+                    catch(e) {}
+                    });
                   },);
                 }, 
                 child: Row(
@@ -107,20 +114,25 @@ class _EditTaskState extends State<EditTask> {
                     context: context, 
                     initialTime: time_time
                   ).then((value) {
-                    setState(() {time_time = value as TimeOfDay;
-                    time = value.toString();
-                    time = time.split("(")[1].split(")")[0];
-                    List<int> time_components = [int.parse(time.split(":")[0]), int.parse(time.split(":")[1])];
-                    String meridian = time_components[0] >= 12 ? "PM" : "AM";
-                    if (time_components[0] >= 12)
-                    {
-                      time_components[0] -= 12;
+                    setState(() {
+                    try {
+                      time_time = value as TimeOfDay;
+                      time = value.toString();
+                      time = time.split("(")[1].split(")")[0];
+                      List<int> time_components = [int.parse(time.split(":")[0]), int.parse(time.split(":")[1])];
+                      String meridian = time_components[0] >= 12 ? "PM" : "AM";
+                      if (time_components[0] >= 12)
+                      {
+                        time_components[0] -= 12;
+                      }
+                      if (time_components[0] == 0)
+                      {
+                        time_components[0] = 12;
+                      }
+                      time = "${time_components[0] < 10 ? 0 : ""}${time_components[0]}:${time_components[1] < 10 ? 0 : ""}${time_components[1]} $meridian";
                     }
-                    if (time_components[0] == 0)
-                    {
-                      time_components[0] = 12;
-                    }
-                    time = "${time_components[0] < 10 ? 0 : ""}${time_components[0]}:${time_components[1] < 10 ? 0 : ""}${time_components[1]} $meridian";});
+                    catch(e) {}
+                    });
                   },);
                 }, 
                 child: Row(
